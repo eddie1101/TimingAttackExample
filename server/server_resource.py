@@ -1,4 +1,4 @@
-from flask_restful import Resource, request
+from flask_restful import Resource, reqparse
 
 from hashlib import sha256
 from secrets import token_hex
@@ -13,9 +13,15 @@ class UserAPIEndpoint(Resource):
 
 
     def post(self): #login
+
+        request_parser = reqparse.RequestParser()
+        request_parser.add_argument("username")
+        request_parser.add_argument("password")
+        args = request_parser.parse_args()
+
         hasher = sha256()
-        hasher.update(request.headers.get("password").encode("UTF-8"))
-        username = request.headers.get("username")
+        hasher.update(args["password"].encode("UTF-8"))
+        username = args["username"]
         password = hasher.hexdigest()
 
         #Password cannot be spoofed by timing attack in this case
@@ -27,8 +33,14 @@ class UserAPIEndpoint(Resource):
 
     
     def get(self):
-        username = request.headers.get("username")
-        session_key = request.headers.get("session_key")
+
+        request_parser = reqparse.RequestParser()
+        request_parser.add_argument("username")
+        request_parser.add_argument("session_key")
+        args = request_parser.parse_args()
+
+        username = args["username"]
+        session_key = args["session_key"]
 
         #Session key can be spoofed, however
         if bad_compare(db.user_sessions[username], session_key):

@@ -6,7 +6,7 @@ from server_resource import UserAPIEndpoint
 app = Flask(__name__)
 api = Api(app)
 
-api.add_resource(User, "/login")
+api.add_resource(UserAPIEndpoint, "/login")
 
 if __name__ == "__main__":
     app.run(debug=True)
